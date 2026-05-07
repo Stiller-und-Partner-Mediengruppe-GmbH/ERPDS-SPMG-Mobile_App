@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ERPDS</string>
+    <string name="company_name">Stiller und Partner Mediengruppe GmbH</string>
+    <string name="app_logo_description">App Logo</string>
+    <string name="greeting_morning">Guten Morgen, %1$s</string>
+    <string name="greeting_day">Guten Tag, %1$s</string>
+    <string name="assignments_title">Einsätze</string>
+    <string name="action_open">Öffnen</string>
+    <string name="action_dismiss">Verwerfen</string>
+    <string name="action_show_report">Einsatzbericht anzeigen</string>
+    <string name="section_current_assignment">Aktueller Einsatz</string>
+    <string name="section_past_assignments">Letzte Einsätze</string>
+</resources>
