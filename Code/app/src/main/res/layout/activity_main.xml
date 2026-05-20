@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity"
-    tools:ignore="VisualLintSystemUi">
+    tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -20,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/brand_dark_blue"
-            app:title="SPMG - ERPDS"
+            app:title="SPMG - ERPDS Control"
             app:titleTextColor="@android:color/white">
 
             <ImageView
@@ -30,52 +29,89 @@
                 android:layout_marginEnd="12dp"
                 android:contentDescription="@string/app_logo_description"
                 android:src="@drawable/ic_logo"
-                tools:ignore="ImageContrastCheck"
                 tools:srcCompat="@tools:sample/avatars" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/userNameTextView"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:textAppearance="?attr/textAppearanceTitleLarge"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        tools:text="Guten Tag, Max Mustermann" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/assignmentsTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/assignments_title"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/userNameTextView" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/assignmentsRecyclerView"
-        android:layout_width="408dp"
-        android:layout_height="318dp"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/assignmentsTitle"
-        app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/item_assignment" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/userNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceTitleLarge"
+                android:layout_marginBottom="16dp"
+                tools:text="Guten Tag, Max Mustermann" />
+
+            <!-- 1. Zeiterfassung & Sicherheit -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/section_time_security"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="8dp"/>
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:layout_marginTop="8dp">
+                <Button android:id="@+id/btnCheckInOut" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_check_in_out" android:textSize="12sp"/>
+                <Button android:id="@+id/btnPrivacy2FA" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_privacy_2fa" android:textSize="12sp"/>
+                <Button android:id="@+id/btnWatchEmergency" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_watch_emergency" android:textSize="12sp"/>
+                <Button android:id="@+id/btnEvacList" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_evac_list" android:textSize="12sp"/>
+            </GridLayout>
+
+            <!-- 2. Mobiler Fuhrpark-Copilot -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/section_fleet"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="16dp"/>
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:layout_marginTop="8dp">
+                <Button android:id="@+id/btnQRCheckIn" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_fleet_combined" android:textSize="12sp"/>
+                <Button android:id="@+id/btnDispatch" style="@style/Widget.Material3.Button" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_dispatch" android:backgroundTint="@color/brand_dark_blue"/>
+            </GridLayout>
+
+            <!-- 3. Gastronomie- & Service-Terminals (POS) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/section_gastro"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="16dp"/>
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:layout_marginTop="8dp">
+                <Button android:id="@+id/btnWaiterPad" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_waiter_pad" android:textSize="12sp"/>
+                <Button android:id="@+id/btnSmartWallet" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_smart_wallet" android:textSize="12sp"/>
+                <Button android:id="@+id/btnTicketScanner" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:text="@string/btn_scanner" android:textSize="12sp"/>
+            </GridLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

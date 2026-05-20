@@ -30,25 +30,25 @@ class AssignmentReportActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        val title = intent.getStringExtra("title") ?: "Unbekannter Einsatz"
-        val creationTime = intent.getStringExtra("creationTime") ?: "Unbekannt"
-        val completionTime = intent.getStringExtra("completionTime") ?: "Unbekannt"
-        val acceptanceTime = intent.getStringExtra("acceptanceTime") ?: "Unbekannt"
+        val title = intent.getStringExtra("title") ?: getString(R.string.unknown)
+        val creationTime = intent.getStringExtra("creationTime") ?: getString(R.string.unknown)
+        val completionTime = intent.getStringExtra("completionTime") ?: getString(R.string.unknown)
+        val acceptanceTime = intent.getStringExtra("acceptanceTime") ?: getString(R.string.unknown)
         
-        findViewById<TextView>(R.id.reportTitle).text = "Bericht: $title"
-        findViewById<TextView>(R.id.reportDate).text = "Datum: ${creationTime.split(" ")[0]}"
+        findViewById<TextView>(R.id.reportTitle).text = getString(R.string.report_title_prefix, title)
+        findViewById<TextView>(R.id.reportDate).text = getString(R.string.report_date_prefix, if (creationTime != getString(R.string.unknown)) creationTime.split(" ")[0] else getString(R.string.placeholder_date))
         
         // Detailed timestamps from System Time
         findViewById<TextView>(R.id.reportTimestamps).text = 
-            "Erstellt: $creationTime\nAbgeschlossen: $completionTime"
+            getString(R.string.report_timestamps_format, creationTime, completionTime)
             
         findViewById<TextView>(R.id.reportSummary).text = 
-            "Der Einsatz wurde erfolgreich abgeschlossen. Alle Systeme der $title sind wieder betriebsbereit."
+            getString(R.string.report_summary_format, title)
 
         val container = findViewById<LinearLayout>(R.id.reportUnitsContainer)
         
         val units = listOf(
-            UnitReport("SPMG Mobil 1 (SPMG)", acceptanceTime, acceptanceTime), // Vereinfacht für Beispiel
+            UnitReport("SPMG Mobil 1 (SPMG)", acceptanceTime, acceptanceTime),
             UnitReport("Florian Muster 1/44-1 (FF)", "14:16", "14:25"),
             UnitReport("Rettung Muster 1/83-1 (RD)", "14:16", "14:28")
         )
@@ -57,7 +57,7 @@ class AssignmentReportActivity : AppCompatActivity() {
         units.forEach { unit ->
             val view = inflater.inflate(R.layout.item_unit_report, container, false)
             view.findViewById<TextView>(R.id.unitTitle).text = unit.name
-            view.findViewById<TextView>(R.id.unitTimes).text = "Alarmiert: ${unit.alarmTime} | Eingetroffen: ${unit.arrivalTime}"
+            view.findViewById<TextView>(R.id.unitTimes).text = getString(R.string.unit_report_times_format, unit.alarmTime, unit.arrivalTime)
             container.addView(view)
         }
     }

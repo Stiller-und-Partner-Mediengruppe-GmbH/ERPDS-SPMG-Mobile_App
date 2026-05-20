@@ -63,7 +63,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Uhrzeit"
+                android:text="@string/label_uhrzeit"
                 android:textAppearance="?attr/textAppearanceLabelLarge" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -77,7 +77,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ort"
+                android:text="@string/label_ort"
                 android:textAppearance="?attr/textAppearanceLabelLarge" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -91,7 +91,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Beschreibung"
+                android:text="@string/label_beschreibung"
                 android:textAppearance="?attr/textAppearanceLabelLarge" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -105,7 +105,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Weitere Einheiten"
+                android:text="@string/label_einheiten"
                 android:textAppearance="?attr/textAppearanceLabelLarge" />
 
             <LinearLayout
@@ -130,7 +130,7 @@
             android:id="@+id/btnAcceptAssignment"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:text="Einsatz annehmen"
+            android:text="@string/btn_accept_assignment"
             android:textSize="18sp"
             app:cornerRadius="12dp" />
     </FrameLayout>

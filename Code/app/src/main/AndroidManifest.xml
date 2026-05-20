@@ -12,6 +12,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ERPDS">
         <activity
+            android:name=".FleetActivity"
+            android:exported="false"
+            android:label="Fuhrpark-Copilot" />
+        <activity
+            android:name=".CheckInOutActivity"
+            android:exported="false"
+            android:label="@string/title_check_in_out" />
+        <activity
+            android:name=".PrivacyAuthActivity"
+            android:exported="false"
+            android:label="@string/title_privacy_2fa" />
+        <activity
+            android:name=".FeatureActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DispatchActivity"
+            android:exported="false"
+            android:label="Dispatch &amp; Einsätze" />
+        <activity
             android:name=".AssignmentReportActivity"
             android:exported="false"
             android:label="Einsatzbericht" />

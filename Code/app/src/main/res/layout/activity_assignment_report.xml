@@ -77,7 +77,7 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Einsatz-Informationen"
+                        android:text="@string/label_info"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="?attr/colorPrimary" />
 
@@ -97,7 +97,7 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Tätigkeitsbericht"
+                        android:text="@string/label_report"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="?attr/colorPrimary" />
 
@@ -116,7 +116,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Detaillierte Einheitenübersicht"
+                android:text="@string/label_units_overview"
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
 
             <LinearLayout

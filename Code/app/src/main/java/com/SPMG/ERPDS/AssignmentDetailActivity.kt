@@ -19,6 +19,7 @@ class AssignmentDetailActivity : AppCompatActivity() {
     private var isAccepted = false
     private var creationTime: String = ""
     private var acceptanceTime: String = ""
+    private var assignmentId: String = ""
 
     private fun getCurrentTimestamp(pattern: String = "dd.MM.yyyy HH:mm"): String {
         val sdf = java.text.SimpleDateFormat(pattern, java.util.Locale.getDefault())
@@ -31,9 +32,14 @@ class AssignmentDetailActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_assignment_detail)
         
-        // Use current time in Vienna TimeZone as creation/received time
-        creationTime = getCurrentTimestamp()
+        assignmentId = intent.getStringExtra("assignmentId") ?: ""
+        val initialStatus = intent.getStringExtra("status") ?: "NEW"
+        isAccepted = initialStatus == "ONGOING"
         
+        // Use current time in Vienna TimeZone as creation/received time
+        creationTime = intent.getStringExtra("creationTime") ?: getCurrentTimestamp()
+        acceptanceTime = intent.getStringExtra("acceptanceTime") ?: ""
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -49,9 +55,9 @@ class AssignmentDetailActivity : AppCompatActivity() {
         val details = intent.getStringExtra("details") ?: ""
 
         findViewById<TextView>(R.id.detailStichwort).text = title
-        findViewById<TextView>(R.id.detailNummer).text = "Einsatz-Nr: 2024-001"
-        findViewById<TextView>(R.id.detailUhrzeit).text = "${getCurrentTimestamp("HH:mm")} Uhr"
-        findViewById<TextView>(R.id.detailOrt).text = "Musterstraße 12, 12345 Musterstadt"
+        findViewById<TextView>(R.id.detailNummer).text = getString(R.string.assignment_number_prefix, "2024-001")
+        findViewById<TextView>(R.id.detailUhrzeit).text = getString(R.string.time_label_format, getString(R.string.label_uhrzeit), getCurrentTimestamp("HH:mm"))
+        findViewById<TextView>(R.id.detailOrt).text = getString(R.string.placeholder_location)
         findViewById<TextView>(R.id.detailBeschreibung).text = details
 
         val unitsContainer = findViewById<LinearLayout>(R.id.unitsContainer)
@@ -64,6 +70,12 @@ class AssignmentDetailActivity : AppCompatActivity() {
         otherUnits.forEach { addUnitToLayout(it, unitsContainer) }
 
         val actionButton = findViewById<Button>(R.id.btnAcceptAssignment)
+        
+        if (isAccepted) {
+            actionButton.text = getString(R.string.btn_complete_assignment)
+            addUnitToLayout(UnitInfo("SPMG Mobil 1", "SPMG", getString(R.string.unit_accepted_format, acceptanceTime)), unitsContainer)
+        }
+
         actionButton.setOnClickListener {
             val currentTime = getCurrentTimestamp("HH:mm")
             
@@ -71,14 +83,32 @@ class AssignmentDetailActivity : AppCompatActivity() {
                 // PHASE 1: ACCEPT
                 isAccepted = true
                 acceptanceTime = currentTime
-                val ownUnit = UnitInfo("SPMG Mobil 1", "SPMG", "Einsatz angenommen um $acceptanceTime")
+                val ownUnit = UnitInfo("SPMG Mobil 1", "SPMG", getString(R.string.unit_accepted_format, acceptanceTime))
                 addUnitToLayout(ownUnit, unitsContainer)
                 
-                actionButton.text = "Einsatz abschließen"
-                Toast.makeText(this, "Einsatz angenommen", Toast.LENGTH_SHORT).show()
+                actionButton.text = getString(R.string.btn_complete_assignment)
+                
+                // Return result to MainActivity
+                val resultIntent = Intent().apply {
+                    putExtra("assignmentId", assignmentId)
+                    putExtra("newStatus", "ONGOING")
+                    putExtra("acceptanceTime", acceptanceTime)
+                }
+                setResult(RESULT_OK, resultIntent)
+                
+                Toast.makeText(this, R.string.btn_accept_assignment, Toast.LENGTH_SHORT).show()
             } else {
                 // PHASE 2: COMPLETE
                 val completionTime = getCurrentTimestamp()
+                
+                // Return result to MainActivity
+                val resultIntent = Intent().apply {
+                    putExtra("assignmentId", assignmentId)
+                    putExtra("newStatus", "COMPLETED")
+                    putExtra("completionTime", completionTime)
+                }
+                setResult(RESULT_OK, resultIntent)
+
                 val intent = Intent(this, AssignmentReportActivity::class.java).apply {
                     putExtra("title", title)
                     putExtra("creationTime", creationTime)
@@ -86,14 +116,14 @@ class AssignmentDetailActivity : AppCompatActivity() {
                     putExtra("completionTime", completionTime)
                 }
                 startActivity(intent)
-                finish() // Close details after completion
+                finish()
             }
         }
     }
 
     private fun addUnitToLayout(unit: UnitInfo, container: LinearLayout) {
         val view = LayoutInflater.from(this).inflate(R.layout.item_unit, container, false)
-        view.findViewById<TextView>(R.id.unitInfo).text = "${unit.callsign} (${unit.organization}):"
+        view.findViewById<TextView>(R.id.unitInfo).text = getString(R.string.unit_info_format, unit.callsign, unit.organization)
         view.findViewById<TextView>(R.id.unitStatus).text = unit.status
         container.addView(view)
     }
