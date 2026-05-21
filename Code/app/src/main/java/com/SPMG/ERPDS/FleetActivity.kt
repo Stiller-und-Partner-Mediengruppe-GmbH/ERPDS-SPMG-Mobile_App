@@ -1,18 +1,30 @@
 package com.SPMG.ERPDS
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.OptIn
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class FleetActivity : BaseActivity() {
 
@@ -22,10 +34,16 @@ class FleetActivity : BaseActivity() {
 
     private var currentVehicle: String? = null
     private var currentRole: String? = null
+    private var scannedVehicleName: String? = null
+
+    private lateinit var cameraExecutor: ExecutorService
+    private var cameraProvider: ProcessCameraProvider? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fleet)
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
         // Load Persistence
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -33,7 +51,7 @@ class FleetActivity : BaseActivity() {
         currentRole = prefs.getString(KEY_ROLE, null)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
@@ -47,6 +65,7 @@ class FleetActivity : BaseActivity() {
 
         findViewById<Button>(R.id.btnSimulateScan).setOnClickListener {
             if (isTimeTrackingActive()) {
+                scannedVehicleName = getString(R.string.vehicle_mock_name)
                 showRoleSelection()
             } else {
                 Toast.makeText(this, "Keine aktive Schicht! Bitte zuerst in Zeiterfassung einchecken.", Toast.LENGTH_LONG).show()
@@ -66,7 +85,7 @@ class FleetActivity : BaseActivity() {
             
             if (checkedId != View.NO_ID) {
                 val chip = findViewById<Chip>(checkedId)
-                saveFleetState(getString(R.string.vehicle_mock_name), chip.text.toString())
+                saveFleetState(scannedVehicleName ?: getString(R.string.vehicle_mock_name), chip.text.toString())
                 Toast.makeText(this, "Fahrzeug Check-in erfolgreich!", Toast.LENGTH_SHORT).show()
                 updateUI()
             } else {
@@ -79,16 +98,113 @@ class FleetActivity : BaseActivity() {
             Toast.makeText(this, "Fahrzeug verlassen", Toast.LENGTH_SHORT).show()
             updateUI()
         }
+
+        if (currentVehicle == null) {
+            checkCameraPermission()
+        }
+    }
+
+    private fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 10)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 10 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startCamera()
+        } else {
+            Toast.makeText(this, "Kamera-Berechtigung wird für den QR-Scan benötigt.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            cameraProvider = cameraProviderFuture.get()
+            bindCameraUseCases()
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun bindCameraUseCases() {
+        val cameraProvider = cameraProvider ?: return
+        val previewView = findViewById<PreviewView>(R.id.viewFinder)
+
+        val preview = Preview.Builder().build().also {
+            it.setSurfaceProvider(previewView.surfaceProvider)
+        }
+
+        val barcodeScanner = BarcodeScanning.getClient()
+        val imageAnalysis = ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+
+        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+            processImageProxy(barcodeScanner, imageProxy)
+        }
+
+        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+        } catch (exc: Exception) {
+            Log.e("FleetActivity", "Use case binding failed", exc)
+        }
+    }
+
+    @OptIn(ExperimentalGetImage::class)
+    private fun processImageProxy(barcodeScanner: BarcodeScanner, imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image
+        if (mediaImage != null) {
+            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+            barcodeScanner.process(image)
+                .addOnSuccessListener { barcodes ->
+                    if (barcodes.isNotEmpty()) {
+                        handleBarcode(barcodes[0])
+                    }
+                }
+                .addOnFailureListener {
+                    Log.e("FleetActivity", "Barcode scanning failed", it)
+                }
+                .addOnCompleteListener {
+                    imageProxy.close()
+                }
+        } else {
+            imageProxy.close()
+        }
+    }
+
+    private fun handleBarcode(barcode: Barcode) {
+        val value = barcode.displayValue ?: return
+        runOnUiThread {
+            if (currentVehicle == null && scannedVehicleName == null) {
+                if (isTimeTrackingActive()) {
+                    scannedVehicleName = value
+                    Toast.makeText(this, "QR-Code erkannt: $value", Toast.LENGTH_SHORT).show()
+                    showRoleSelection()
+                } else {
+                    Toast.makeText(this, "Bitte zuerst einchecken!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        // Redundancy Check: Clear fleet if time tracking is not active
         if (!isTimeTrackingActive() && currentVehicle != null) {
             clearFleetState()
             updateUI()
             Toast.makeText(this, "Außerhalb der Schichtzeit: Fuhrparkzuweisung beendet.", Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 
     private fun isTimeTrackingActive(): Boolean {
@@ -109,15 +225,24 @@ class FleetActivity : BaseActivity() {
     private fun clearFleetState() {
         currentVehicle = null
         currentRole = null
+        scannedVehicleName = null
         getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+        // Restart camera if we just cleared the state
+        checkCameraPermission()
     }
 
     private fun showRoleSelection() {
+        // Stop camera analysis/preview when showing role selection to save resources
+        cameraProvider?.unbindAll()
+
         findViewById<View>(R.id.scannerContainer).visibility = View.VISIBLE
         findViewById<View>(R.id.scanOverlay).visibility = View.GONE
         findViewById<View>(R.id.btnSimulateScan).visibility = View.GONE
         findViewById<View>(R.id.roleSelectionCard).visibility = View.VISIBLE
         findViewById<View>(R.id.fleetOverviewContainer).visibility = View.GONE
+        
+        // Update vehicle name in the card
+        findViewById<TextView>(R.id.vehicle_found_name_text)?.text = scannedVehicleName ?: getString(R.string.vehicle_mock_name)
     }
 
     private fun updateUI() {
@@ -128,14 +253,13 @@ class FleetActivity : BaseActivity() {
         val fleetOverview = findViewById<View>(R.id.fleetOverviewContainer)
 
         if (currentVehicle == null) {
-            // Scanner View
             scannerContainer.visibility = View.VISIBLE
             scanOverlay.visibility = View.VISIBLE
             btnSimulate.visibility = View.VISIBLE
             roleCard.visibility = View.GONE
             fleetOverview.visibility = View.GONE
         } else {
-            // Dashboard View
+            cameraProvider?.unbindAll()
             scannerContainer.visibility = View.GONE
             roleCard.visibility = View.GONE
             fleetOverview.visibility = View.VISIBLE

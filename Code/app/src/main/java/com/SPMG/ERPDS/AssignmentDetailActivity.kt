@@ -156,7 +156,7 @@ class AssignmentDetailActivity : BaseActivity() {
     private fun checkIdentitySync() {
         val fleetPrefs = getSharedPreferences("FleetPrefs", MODE_PRIVATE)
         val currentVehicle = fleetPrefs.getString("CurrentVehicle", null)
-        val personalCallsign = "Mitarbeiter: Max Mustermann"
+        val personalCallsign = getString(R.string.label_personal_identity, getDeviceUserIdentity())
         
         if (!isAccepted) return
 
@@ -236,7 +236,7 @@ class AssignmentDetailActivity : BaseActivity() {
             .setTitle(R.string.prompt_identity_selection)
             .setMessage(R.string.prompt_identity_message)
             .setPositiveButton(R.string.btn_identity_personal) { _, _ ->
-                performAcceptance("Mitarbeiter: Max Mustermann", container, button)
+                performAcceptance(getString(R.string.label_personal_identity, getDeviceUserIdentity()), container, button)
             }
             .setNegativeButton(R.string.btn_identity_vehicle) { _, _ ->
                 fleetLauncher.launch(Intent(this, FleetActivity::class.java))

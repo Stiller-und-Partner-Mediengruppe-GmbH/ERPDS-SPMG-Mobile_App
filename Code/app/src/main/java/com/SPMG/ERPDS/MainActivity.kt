@@ -1,15 +1,28 @@
 package com.SPMG.ERPDS
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : BaseActivity() {
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.READ_CONTACTS] == true || 
+            permissions[Manifest.permission.GET_ACCOUNTS] == true) {
+            // Berechtigungen erhalten, Namen neu laden
+            updateGreeting()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,13 +35,7 @@ class MainActivity : BaseActivity() {
             insets
         }
 
-        // Set personalized greeting
-        val userName = "Max Mustermann"
-        val userNameTextView = findViewById<TextView>(R.id.userNameTextView)
-        val calendar = java.util.Calendar.getInstance()
-        val hour = calendar[java.util.Calendar.HOUR_OF_DAY]
-        val greetingResId = if (hour in 0..10) R.string.greeting_morning else R.string.greeting_day
-        userNameTextView.text = getString(greetingResId, userName)
+        checkPermissionsAndLoadIdentity()
 
         // Fuhrpark (Konsolidierte Funktion)
         findViewById<Button>(R.id.btnQRCheckIn).setOnClickListener {
@@ -64,6 +71,30 @@ class MainActivity : BaseActivity() {
         findViewById<Button>(R.id.btnTicketScanner).setOnClickListener {
             launchFeature("Ticket- & Chip-Scanner")
         }
+    }
+
+    private fun checkPermissionsAndLoadIdentity() {
+        val hasContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
+        val hasAccounts = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasContacts || !hasAccounts) {
+            requestPermissionLauncher.launch(arrayOf(
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.GET_ACCOUNTS
+            ))
+        }
+        
+        // Initialer Versuch (evtl. nur Bluetooth/Modell Fallback)
+        updateGreeting()
+    }
+
+    private fun updateGreeting() {
+        val userName = getDeviceUserIdentity()
+        val userNameTextView = findViewById<TextView>(R.id.userNameTextView)
+        val calendar = java.util.Calendar.getInstance()
+        val hour = calendar[java.util.Calendar.HOUR_OF_DAY]
+        val greetingResId = if ((hour in 0..10)) R.string.greeting_morning else R.string.greeting_day
+        userNameTextView.text = getString(greetingResId, userName)
     }
 
     private fun launchFeature(title: String) {

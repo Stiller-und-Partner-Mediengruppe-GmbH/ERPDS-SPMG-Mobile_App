@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/brand_dark_blue"
-            app:title="SPMG - ERPDS Control"
+            app:title="SPMG - ERPDS"
             app:titleTextColor="@android:color/white">
 
             <ImageView
