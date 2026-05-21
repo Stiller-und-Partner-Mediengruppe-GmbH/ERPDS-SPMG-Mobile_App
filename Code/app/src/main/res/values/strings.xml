@@ -41,7 +41,8 @@
     <string name="report_title_prefix">Bericht: %1$s</string>
     <string name="report_date_prefix">Datum: %1$s</string>
     <string name="report_timestamps_format">Erstellt: %1$s\nAbgeschlossen: %2$s</string>
-    <string name="report_summary_format">Der Einsatz wurde erfolgreich abgeschlossen. Alle Systeme der %1$s sind wieder betriebsbereit.</string>
+    <string name="report_summary_header">Zusammenfassung &amp; Protokoll:</string>
+    <string name="report_summary_default">Der Einsatz wurde ordnungsgemäß abgeschlossen.</string>
     <string name="unit_info_format">%1$s (%2$s):</string>
     <string name="unit_accepted_format">Einsatz angenommen um %1$s</string>
     <string name="unit_report_times_format">Alarmiert: %1$s | Eingetroffen: %2$s</string>
@@ -90,4 +91,26 @@
     <string name="radio_status_format">Gekoppelt: %1$s</string>
     <string name="radio_sync_ok">Status: Funkrufname übertragen</string>
     <string name="azg_rest_active">AZG-Schutz aktiv (11h Ruhezeit)</string>
+    <string name="error_no_active_shift">Keine aktive Schicht! Bitte zuerst in Zeiterfassung einchecken, um Einsätze zu bearbeiten.</string>
+    <string name="prompt_identity_selection">Identität für Einsatz wählen</string>
+    <string name="prompt_identity_message">Es wurde keine aktive Fahrzeugzuweisung gefunden. Möchten Sie den Einsatz unter Ihrer persönlichen Mitarbeiterkennung oder einem Fahrzeug zuweisen?</string>
+    <string name="btn_identity_personal">Persönliche Kennung</string>
+    <string name="btn_identity_vehicle">Fahrzeug zuweisen</string>
+
+    <!-- Create Assignment -->
+    <string name="title_create_assignment">Einsatz erstellen (Test)</string>
+    <string name="hint_assignment_title">Einsatzstichwort (z.B. B3 Gebäudebrand)</string>
+    <string name="hint_assignment_number">Einsatznummer (z.B. 2024-999)</string>
+    <string name="hint_assignment_location">Einsatzort (Adresse)</string>
+    <string name="hint_assignment_details">Zusatzinformationen / Details</string>
+    <string name="label_select_department">Bereich wählen:</string>
+    <string name="dept_ems">Rettungsdienst (144)</string>
+    <string name="dept_security">Sicherheitsdienst (133)</string>
+    <string name="dept_fire">BtF / Brandschutz (122)</string>
+    <string name="hint_initial_units">Erste Einheiten (z.B. SI-01, RTW-2)</string>
+    <string name="label_assigned_units_count">Zugeordnete Einheiten: %1$d</string>
+    <string name="label_no_units_assigned">Noch keine Einheiten zugewiesen.</string>
+    <string name="btn_add_units">+ Einheiten hinzufügen</string>
+    <string name="btn_create">Hinzufügen</string>
+    <string name="btn_cancel">Abbrechen</string>
 </resources>

@@ -9,14 +9,27 @@ import androidx.recyclerview.widget.RecyclerView
 
 enum class AssignmentStatus { NEW, ONGOING, COMPLETED }
 
+data class UnitData(
+    val callsign: String,
+    val organization: String,
+    var status: String = "",
+    var alarmTime: String = "",
+    var arrivalTime: String = ""
+)
+
 data class Assignment(
     val id: String,
+    val number: String,
     val title: String,
     val details: String,
+    val location: String,
     var status: AssignmentStatus = AssignmentStatus.NEW,
     var creationTime: String = "",
     var acceptanceTime: String = "",
-    var completionTime: String = ""
+    var completionTime: String = "",
+    var callsign: String = "",
+    var notes: String = "",
+    val assignedUnits: MutableList<UnitData> = mutableListOf()
 )
 
 sealed class AdapterItem {

@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,10 +30,14 @@ class MainActivity : AppCompatActivity() {
         val greetingResId = if (hour in 0..10) R.string.greeting_morning else R.string.greeting_day
         userNameTextView.text = getString(greetingResId, userName)
 
-        // Navigation to Dispatch / Assignments
+        // Fuhrpark (Konsolidierte Funktion)
+        findViewById<Button>(R.id.btnQRCheckIn).setOnClickListener {
+            startActivity(Intent(this, FleetActivity::class.java))
+        }
+
+        // Dispatch / Einsätze
         findViewById<Button>(R.id.btnDispatch).setOnClickListener {
-            val intent = Intent(this, DispatchActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, DispatchActivity::class.java))
         }
 
         // Zeiterfassung & Sicherheit
@@ -47,11 +52,6 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.btnEvacList).setOnClickListener {
             launchFeature("Dynamische Evakuierungsliste")
-        }
-
-        // Fuhrpark (Konsolidierte Funktion)
-        findViewById<Button>(R.id.btnQRCheckIn).setOnClickListener {
-            startActivity(Intent(this, FleetActivity::class.java))
         }
 
         // Gastro

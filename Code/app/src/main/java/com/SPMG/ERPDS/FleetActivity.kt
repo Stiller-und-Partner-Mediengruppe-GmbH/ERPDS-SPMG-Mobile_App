@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
-class FleetActivity : AppCompatActivity() {
+class FleetActivity : BaseActivity() {
 
     private val PREFS_NAME = "FleetPrefs"
     private val KEY_VEHICLE = "CurrentVehicle"
@@ -25,7 +25,6 @@ class FleetActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_fleet)
 
         // Load Persistence
@@ -47,17 +46,28 @@ class FleetActivity : AppCompatActivity() {
         updateUI()
 
         findViewById<Button>(R.id.btnSimulateScan).setOnClickListener {
-            showRoleSelection()
+            if (isTimeTrackingActive()) {
+                showRoleSelection()
+            } else {
+                Toast.makeText(this, "Keine aktive Schicht! Bitte zuerst in Zeiterfassung einchecken.", Toast.LENGTH_LONG).show()
+            }
         }
 
         findViewById<Button>(R.id.btnConfirmCheckin).setOnClickListener {
+            if (!isTimeTrackingActive()) {
+                Toast.makeText(this, "Schicht beendet! Check-in nicht möglich.", Toast.LENGTH_LONG).show()
+                clearFleetState()
+                updateUI()
+                return@setOnClickListener
+            }
+
             val roleGroup = findViewById<ChipGroup>(R.id.roleChipGroup)
             val checkedId = roleGroup.checkedChipId
             
             if (checkedId != View.NO_ID) {
                 val chip = findViewById<Chip>(checkedId)
                 saveFleetState(getString(R.string.vehicle_mock_name), chip.text.toString())
-                Toast.makeText(this, "Check-in erfolgreich!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Fahrzeug Check-in erfolgreich!", Toast.LENGTH_SHORT).show()
                 updateUI()
             } else {
                 Toast.makeText(this, "Bitte eine Rolle auswählen", Toast.LENGTH_SHORT).show()
@@ -69,6 +79,21 @@ class FleetActivity : AppCompatActivity() {
             Toast.makeText(this, "Fahrzeug verlassen", Toast.LENGTH_SHORT).show()
             updateUI()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Redundancy Check: Clear fleet if time tracking is not active
+        if (!isTimeTrackingActive() && currentVehicle != null) {
+            clearFleetState()
+            updateUI()
+            Toast.makeText(this, "Außerhalb der Schichtzeit: Fuhrparkzuweisung beendet.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun isTimeTrackingActive(): Boolean {
+        val checkInPrefs = getSharedPreferences("CheckInPrefs", Context.MODE_PRIVATE)
+        return checkInPrefs.getBoolean("IsCheckedIn", false)
     }
 
     private fun saveFleetState(vehicle: String, role: String) {

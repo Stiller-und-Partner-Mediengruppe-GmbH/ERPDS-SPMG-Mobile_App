@@ -11,14 +11,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.card.MaterialCardView
 
-class PrivacyAuthActivity : AppCompatActivity() {
+class PrivacyAuthActivity : BaseActivity() {
     private var isRevealed = false
     private val hideHandler = Handler(Looper.getMainLooper())
     private val hideRunnable = Runnable { hideCode() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_privacy_auth)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
