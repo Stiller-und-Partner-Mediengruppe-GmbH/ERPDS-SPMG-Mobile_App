@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.view.LayoutInflater
 import android.view.View
@@ -63,7 +63,7 @@ class AssignmentsAdapter(
             if (item is AdapterItem.Header) {
                 visibleItems.add(item)
                 currentHeaderExpanded = item.isExpanded
-            } else if (item is AdapterItem.AssignmentItem && currentHeaderExpanded) {
+            } else if (item is AdapterItem.AssignmentItem && (currentHeaderExpanded)) {
                 visibleItems.add(item)
             }
         }

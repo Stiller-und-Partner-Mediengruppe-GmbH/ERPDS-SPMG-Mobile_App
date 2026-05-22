@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.spmg.erpds.BaseActivity
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -187,6 +188,7 @@ class AssignmentDetailActivity : BaseActivity() {
             hint = "Tätigkeiten beschreiben..."
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             setLines(3)
+            LanguageUtils.configureGermanInput(this)
         }
         AlertDialog.Builder(this)
             .setTitle("Einsatz abschließen")

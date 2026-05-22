@@ -1,11 +1,9 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -84,14 +82,14 @@ class AssignmentReportActivity : BaseActivity() {
         }
 
         // 2. Add the user's unit for the report
-        val ownArrival = if (acceptanceTime.isNotEmpty()) acceptanceTime else "Nicht eingetroffen"
-        val ownAlarm = try { creationTime.split(" ")[1] } catch (e: Exception) { creationTime }
+        val ownArrival = acceptanceTime.ifEmpty { getString(R.string.not_arrived) }
+        val ownAlarm = try { creationTime.split(" ")[1] } catch (_: Exception) { creationTime }
         units.add(0, UnitData(ownCallsign, "SPMG", "Eingetroffen", ownAlarm, ownArrival))
 
         val inflater = LayoutInflater.from(this)
         units.forEach { unit ->
             val view = inflater.inflate(R.layout.item_unit_report, container, false)
-            view.findViewById<TextView>(R.id.unitTitle).text = "${unit.callsign} (${unit.organization})"
+            view.findViewById<TextView>(R.id.unitTitle).text = getString(R.string.unit_info_format, unit.callsign, unit.organization)
             
             val timeInfo = if (unit.arrivalTime.isNotEmpty()) {
                 getString(R.string.unit_report_times_format, unit.alarmTime, unit.arrivalTime)

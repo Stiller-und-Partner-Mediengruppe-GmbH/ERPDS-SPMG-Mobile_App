@@ -4,6 +4,10 @@
     <string name="app_logo_description">App Logo</string>
     <string name="greeting_morning">Guten Morgen, %1$s</string>
     <string name="greeting_day">Guten Tag, %1$s</string>
+    <string name="greeting_evening">Guten Abend, %1$s</string>
+    <string name="greeting_night">Gute Nacht, %1$s</string>
+    <string name="section_profile">Ihr Profil</string>
+    <string name="btn_view_full_profile">Vollständiges Profil</string>
     <string name="assignments_title">Einsätze</string>
     <string name="action_open">Öffnen</string>
     <string name="action_dismiss">Verwerfen</string>
@@ -12,18 +16,35 @@
     <string name="section_past_assignments">Letzte Einsätze</string>
 
     <!-- Dashboard Sections -->
-    <string name="section_time_security">1. Zeiterfassung &amp; Sicherheit</string>
+    <string name="section_time_security">1. Zeiterfassung</string>
     <string name="btn_check_in_out">Check-In/Out</string>
     <string name="btn_privacy_2fa">Privacy 2FA</string>
     <string name="btn_watch_emergency">Watch Notruf</string>
+
+    <string name="section_security">2. Sicherheit &amp; Schutz</string>
+    <string name="btn_id_check">ID-Check (NFC)</string>
     <string name="btn_evac_list">Evac-Liste</string>
-    <string name="section_fleet">2. Mobiler Fuhrpark-Copilot</string>
+
+    <!-- ID Check / NFC -->
+    <string name="status_ready_to_scan">Bereit zum Scannen</string>
+    <string name="scan_instructions">Bitte Ausweis an die Rückseite des Geräts halten</string>
+    <string name="status_card_read">Karte gelesen</string>
+    <string name="status_processing">Daten werden verarbeitet…</string>
+    <string name="status_access_granted">ZUTRITT GEWÄHRT</string>
+    <string name="status_access_denied">ZUTRITT VERWEIGERT</string>
+    <string name="unknown_holder">Unbekannter Inhaber</string>
+    <string name="card_type_format">Typ: %1$s</string>
+    <string name="card_uid_format">UID: %1$s</string>
+    <string name="btn_simulate_scan_demo">Scan simulieren (Demo-Modus)</string>
+    <string name="nfc_status_description">NFC Status</string>
+
+    <string name="section_fleet">3. Mobiler Fuhrpark-Copilot</string>
     <string name="btn_fleet_combined">Fuhrpark</string>
     <string name="btn_qr_check_in">QR-Check-in</string>
     <string name="btn_dispatch">EINSÄTZE</string>
     <string name="btn_auto_fleet">Auto Fleet</string>
     <string name="btn_radio_link">Radio Link</string>
-    <string name="section_gastro">3. Gastronomie- &amp; Service (POS)</string>
+    <string name="section_gastro">4. Gastronomie- &amp; Service (POS)</string>
     <string name="btn_waiter_pad">Waiter Pad</string>
     <string name="btn_smart_wallet">Smart Wallet</string>
     <string name="btn_scanner">Scanner</string>
@@ -51,12 +72,14 @@
     <string name="placeholder_location">Musterstraße 12, 12345 Musterstadt</string>
     <string name="placeholder_date">22.05.2024</string>
     <string name="unknown">Unbekannt</string>
+    <string name="not_arrived">Nicht eingetroffen</string>
     <string name="in_development">In Entwicklung</string>
     <string name="feature_on_premise_note">Diese Funktion wird für die On-Premise-Infrastruktur konfiguriert.</string>
 
     <!-- Privacy 2FA -->
     <string name="title_privacy_2fa">Privacy 2FA</string>
     <string name="mask_code">••••••</string>
+    <string name="auth_code_mock">482 917</string>
     <string name="reveal_code_hint">Tippen zum Einblenden</string>
 
     <!-- Check In/Out -->

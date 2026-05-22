@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.ERPDS" parent="Base.Theme.ERPDS" />
+
+    <style name="ShapeAppearance.Circle" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import org.junit.Test
 

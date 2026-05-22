@@ -1,5 +1,4 @@
-package com.SPMG.ERPDS
-
+package com.spmg.erpds
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build

@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.content.Intent
 import android.os.Bundle
@@ -27,9 +27,11 @@ import java.util.UUID
 
 class DispatchActivity : BaseActivity() {
     
-    private val PREFS_ASSIGNMENTS = "AssignmentPrefs"
-    private val KEY_DATA = "AssignmentsJson"
-    private val KEY_COUNTER = "AssignmentCounter"
+    companion object {
+        private const val PREFS_ASSIGNMENTS = "AssignmentPrefs"
+        private const val KEY_DATA = "AssignmentsJson"
+        private const val KEY_COUNTER = "AssignmentCounter"
+    }
 
     private lateinit var allAssignments: MutableList<Assignment>
     private lateinit var adapter: AssignmentsAdapter
@@ -43,7 +45,7 @@ class DispatchActivity : BaseActivity() {
             val id = data?.getStringExtra("assignmentId")
             val newStatusStr = data?.getStringExtra("newStatus")
             
-            if (id != null && newStatusStr != null) {
+            if ((id != null && newStatusStr != null)) {
                 val newStatus = AssignmentStatus.valueOf(newStatusStr)
                 val assignment = allAssignments.find { it.id == id }
                 assignment?.let {
@@ -185,7 +187,10 @@ class DispatchActivity : BaseActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(64, 32, 64, 32)
         }
-        val tvLabel = TextView(this).apply { text = "Zusätzliche Einheiten:"; setPadding(0, 0, 0, 16) }
+        val tvLabel = TextView(this).apply {
+            text = getString(R.string.label_einheiten)
+            setPadding(0, 0, 0, 16)
+        }
         tvLabel.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium)
         
         val unitsSummary = TextView(this).apply {

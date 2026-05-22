@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.Manifest
 import android.content.Context
@@ -28,9 +28,11 @@ import java.util.concurrent.Executors
 
 class FleetActivity : BaseActivity() {
 
-    private val PREFS_NAME = "FleetPrefs"
-    private val KEY_VEHICLE = "CurrentVehicle"
-    private val KEY_ROLE = "CurrentRole"
+    companion object {
+        private const val PREFS_NAME = "FleetPrefs"
+        private const val KEY_VEHICLE = "CurrentVehicle"
+        private const val KEY_ROLE = "CurrentRole"
+    }
 
     private var currentVehicle: String? = null
     private var currentRole: String? = null
@@ -46,7 +48,7 @@ class FleetActivity : BaseActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         // Load Persistence
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         currentVehicle = prefs.getString(KEY_VEHICLE, null)
         currentRole = prefs.getString(KEY_ROLE, null)
 
@@ -114,7 +116,7 @@ class FleetActivity : BaseActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 10 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if ((requestCode == 10 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             startCamera()
         } else {
             Toast.makeText(this, "Kamera-Berechtigung wird für den QR-Scan benötigt.", Toast.LENGTH_LONG).show()

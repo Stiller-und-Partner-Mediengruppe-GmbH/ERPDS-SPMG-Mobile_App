@@ -1,11 +1,9 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -47,7 +45,7 @@ class PrivacyAuthActivity : BaseActivity() {
         val tapHint = findViewById<TextView>(R.id.tapHint)
         
         // Simulating a real 2FA code
-        authCode.text = "482 917" 
+        authCode.text = getString(R.string.auth_code_mock)
         tapHint.alpha = 0f
         
         // Auto-hide after 10 seconds

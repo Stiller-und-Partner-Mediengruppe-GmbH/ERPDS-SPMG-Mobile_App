@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.SPMG.ERPDS"
+    namespace = "com.spmg.erpds"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.SPMG.ERPDS"
+        applicationId = "com.spmg.erpds"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

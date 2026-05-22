@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.content.Context
 import android.view.LayoutInflater

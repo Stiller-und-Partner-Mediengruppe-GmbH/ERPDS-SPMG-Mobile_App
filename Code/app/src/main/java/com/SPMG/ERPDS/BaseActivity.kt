@@ -1,4 +1,4 @@
-package com.SPMG.ERPDS
+package com.spmg.erpds
 
 import android.Manifest
 import android.accounts.AccountManager
@@ -9,11 +9,11 @@ import android.net.Uri
 import android.provider.ContactsContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 abstract class BaseActivity : AppCompatActivity() {
     
     override fun attachBaseContext(newBase: Context) {
-        // Erzwingt das deutsche Locale (Schriftsatz) systemweit.
         super.attachBaseContext(LanguageUtils.wrapContext(newBase))
     }
 
@@ -26,16 +26,11 @@ abstract class BaseActivity : AppCompatActivity() {
         super.applyOverrideConfiguration(overrideConfiguration)
     }
 
-    /**
-     * Lädt die Benutzerkennung/Identität aus dem Hauptkontakt (Profil) des Geräts.
-     * Nutzt eine mehrstufige Suche für maximale Zuverlässigkeit.
-     */
     protected fun getDeviceUserIdentity(): String {
         var identity: String? = null
         
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             try {
-                // 1. Stufe: Den primären Anzeigenamen aus dem Profil-Root lesen (am zuverlässigsten)
                 contentResolver.query(
                     ContactsContract.Profile.CONTENT_URI,
                     arrayOf(ContactsContract.Profile.DISPLAY_NAME, ContactsContract.Profile.DISPLAY_NAME_PRIMARY),
@@ -46,7 +41,6 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
 
-                // 2. Stufe: Falls Anzeigename leer, explizit strukturierte Felder (Vor/Nachname) suchen
                 if (identity.isNullOrEmpty()) {
                     val profileDataUri = Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI, ContactsContract.Contacts.Data.CONTENT_DIRECTORY)
                     val projection = arrayOf(
@@ -66,13 +60,10 @@ abstract class BaseActivity : AppCompatActivity() {
                         }
                     }
                 }
-            } catch (e: Exception) {
-                // Fehler beim Kontaktzugriff (z.B. SecurityException trotz Permission)
-            }
+            } catch (_: Exception) {}
         }
 
-        // 3. Stufe: Fallback auf Google-Konto (Formatierung von Vorname.Nachname)
-        if (identity.isNullOrEmpty() && ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED) {
+        if (identity.isNullOrEmpty() && (ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED)) {
             try {
                 val accounts = AccountManager.get(this).getAccountsByType("com.google")
                 if (accounts.isNotEmpty()) {
@@ -84,10 +75,9 @@ abstract class BaseActivity : AppCompatActivity() {
                         rawName.replaceFirstChar { it.uppercase() }
                     }
                 }
-            } catch (e: Exception) {}
+            } catch (_: Exception) {}
         }
 
-        // 4. Stufe: Personalisierter Bluetooth-Name (User-Set)
         if (identity.isNullOrEmpty()) {
             val btName = android.provider.Settings.Secure.getString(contentResolver, "bluetooth_name")
             if (!btName.isNullOrEmpty() && btName != android.os.Build.MODEL) {
@@ -95,7 +85,26 @@ abstract class BaseActivity : AppCompatActivity() {
             }
         }
 
-        // 5. Stufe: Letzter Ausweg - Gerätemodell oder Standard
         return identity ?: android.os.Build.MODEL ?: "Mitarbeiter"
+    }
+
+    protected fun getDeviceUserProfilePicture(): Uri? {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                contentResolver.query(
+                    ContactsContract.Profile.CONTENT_URI,
+                    arrayOf(ContactsContract.Profile.PHOTO_URI),
+                    null, null, null
+                )?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val uriString = cursor.getString(0)
+                        if (!uriString.isNullOrEmpty()) {
+                            return uriString.toUri()
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        return null
     }
 }

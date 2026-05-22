@@ -17,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ERPDS">
         <activity
+            android:name=".IDCheckActivity"
+            android:exported="false"
+            android:label="ID-Check" />
+        <activity
             android:name=".FleetActivity"
             android:exported="false"
             android:label="Fuhrpark-Copilot" />
