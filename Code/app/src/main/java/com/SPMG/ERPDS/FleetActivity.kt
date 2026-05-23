@@ -1,7 +1,6 @@
 package com.spmg.erpds
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +18,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -119,7 +119,7 @@ class FleetActivity : BaseActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if ((requestCode == 10 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+        if ((requestCode == 10) && grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             startCamera()
         } else {
             Toast.makeText(this, "Kamera-Berechtigung wird für den QR-Scan benötigt.", Toast.LENGTH_LONG).show()
@@ -128,10 +128,13 @@ class FleetActivity : BaseActivity() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
-            bindCameraUseCases()
-        }, ContextCompat.getMainExecutor(this))
+        cameraProviderFuture.addListener(
+            {
+                cameraProvider = cameraProviderFuture.get()
+                bindCameraUseCases()
+            },
+            ContextCompat.getMainExecutor(this),
+        )
     }
 
     private fun bindCameraUseCases() {
@@ -186,7 +189,7 @@ class FleetActivity : BaseActivity() {
     private fun handleBarcode(barcode: Barcode) {
         val value = barcode.displayValue ?: return
         runOnUiThread {
-            if (currentVehicle == null && scannedVehicleName == null) {
+            if ((currentVehicle == null) && (scannedVehicleName == null)) {
                 if (isTimeTrackingActive()) {
                     scannedVehicleName = value
                     Toast.makeText(this, "QR-Code erkannt: $value", Toast.LENGTH_SHORT).show()
@@ -213,17 +216,16 @@ class FleetActivity : BaseActivity() {
     }
 
     private fun isTimeTrackingActive(): Boolean {
-        val checkInPrefs = getSharedPreferences("CheckInPrefs", Context.MODE_PRIVATE)
+        val checkInPrefs = getSharedPreferences("CheckInPrefs", MODE_PRIVATE)
         return checkInPrefs.getBoolean("IsCheckedIn", false)
     }
 
     private fun saveFleetState(vehicle: String, role: String) {
         currentVehicle = vehicle
         currentRole = role
-        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().apply {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putString(KEY_VEHICLE, vehicle)
             putString(KEY_ROLE, role)
-            apply()
         }
     }
 
@@ -231,7 +233,7 @@ class FleetActivity : BaseActivity() {
         currentVehicle = null
         currentRole = null
         scannedVehicleName = null
-        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { clear() }
         // Restart camera if we just cleared the state
         checkCameraPermission()
     }

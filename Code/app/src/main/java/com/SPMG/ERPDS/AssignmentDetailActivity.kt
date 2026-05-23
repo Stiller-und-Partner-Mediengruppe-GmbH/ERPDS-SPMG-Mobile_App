@@ -109,13 +109,15 @@ class AssignmentDetailActivity : BaseActivity() {
 
         updateNotesFieldVisibility()
 
-        etOngoingNotes.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                saveCurrentState()
-            }
-        })
+        etOngoingNotes.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    saveCurrentState()
+                }
+            },
+        )
 
         val fleetPrefs = getSharedPreferences("FleetPrefs", MODE_PRIVATE)
         val currentVehicle = fleetPrefs.getString("CurrentVehicle", null)
@@ -239,11 +241,14 @@ class AssignmentDetailActivity : BaseActivity() {
                     for (j in 0 until unitsArray.length()) {
                         val uo = unitsArray.getJSONObject(j)
                         val uData = UnitData(
-                            uo.getString("callsign"), uo.getString("organization"),
-                            uo.optString("status", ""), uo.optString("alarmTime", ""), uo.optString("arrivalTime", "")
+                            uo.getString("callsign"),
+                            uo.getString("organization"),
+                            uo.optString("status", ""),
+                            uo.optString("alarmTime", ""),
+                            uo.optString("arrivalTime", ""),
                         )
                         assignedUnitsList.add(uData)
-                        if (uData.callsign == activeCallsign && uData.arrivalTime.isNotEmpty()) {
+                        if ((uData.callsign == activeCallsign) && uData.arrivalTime.isNotEmpty()) {
                             arrivalTime = uData.arrivalTime
                         }
                     }
@@ -282,18 +287,18 @@ class AssignmentDetailActivity : BaseActivity() {
         var logEntry: String? = null
         var newCallsign: String? = null
 
-        if ((activeCallsign.startsWith("Mitarbeiter") || activeCallsign == "Persönliche Kennung") && currentVehicle != null) {
+        if (((activeCallsign.startsWith("Mitarbeiter")) || (activeCallsign == "Persönliche Kennung")) && (currentVehicle != null)) {
             logEntry = "Identitätswechsel um $time: Von persönliche Kennung auf Fahrzeug '$currentVehicle' gewechselt."
             newCallsign = currentVehicle
-        } else if (!activeCallsign.startsWith("Mitarbeiter") && activeCallsign != "Persönliche Kennung" && currentVehicle == null) {
+        } else if ((!activeCallsign.startsWith("Mitarbeiter")) && (activeCallsign != "Persönliche Kennung") && (currentVehicle == null)) {
             logEntry = "Identitätswechsel um $time: Fahrzeug abgemeldet. Fallback auf Mitarbeiterkennung."
             newCallsign = personalCallsign
         }
 
         if (newCallsign != null) {
             activeCallsign = newCallsign
-            if (logEntry != null) {
-                assignmentNotes = if (assignmentNotes.isEmpty()) logEntry else "$assignmentNotes\n$logEntry"
+            logEntry?.let {
+                assignmentNotes = if (assignmentNotes.isEmpty()) it else "$assignmentNotes\n$it"
             }
             refreshUnitsDisplay(findViewById(R.id.unitsContainer))
             saveCurrentState()

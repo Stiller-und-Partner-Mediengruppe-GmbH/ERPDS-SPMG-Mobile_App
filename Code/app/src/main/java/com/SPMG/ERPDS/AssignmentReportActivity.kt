@@ -74,7 +74,7 @@ class AssignmentReportActivity : BaseActivity() {
                                         uo.optString("status", ""),
                                         uo.optString("alarmTime", ""),
                                         uo.optString("arrivalTime", ""),
-                                    )
+                                    ),
                                 )
                             }
                         }
@@ -151,7 +151,7 @@ class AssignmentReportActivity : BaseActivity() {
         completionTime: String,
         summary: String,
         units: List<UnitData>,
-        silent: Boolean = false
+        silent: Boolean = false,
     ) {
         val fileName = "Bericht_${number.replace("-", "_")}.txt"
         val relativePath = Environment.DIRECTORY_DOCUMENTS + "/ERPDS_Reports"
@@ -193,7 +193,7 @@ class AssignmentReportActivity : BaseActivity() {
             val selectionArgs = arrayOf(fileName, relativePath, "$relativePath/")
             val cursor = resolver.query(contentUri, arrayOf(MediaStore.MediaColumns._ID), selection, selectionArgs, null)
             
-            val uri: android.net.Uri? = if (cursor != null && cursor.moveToFirst()) {
+            val uri: android.net.Uri? = if ((cursor != null) && cursor.moveToFirst()) {
                 val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID))
                 cursor.close()
                 android.content.ContentUris.withAppendedId(contentUri, id)

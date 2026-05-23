@@ -39,14 +39,14 @@ class DispatchActivity : BaseActivity() {
     private var tempAssignedUnits = mutableListOf<UnitData>()
 
     private val detailActivityLauncher = registerForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
             val id = data?.getStringExtra("assignmentId")
             val newStatusStr = data?.getStringExtra("newStatus")
             
-            if ((id != null && newStatusStr != null)) {
+            if ((id != null) && (newStatusStr != null)) {
                 val newStatus = AssignmentStatus.valueOf(newStatusStr)
                 val assignment = allAssignments.find { it.id == id }
                 assignment?.let {
@@ -110,14 +110,13 @@ class DispatchActivity : BaseActivity() {
                 saveAssignments()
                 adapter.setData(buildAdapterItems(allAssignments))
             },
-            onReportClick = { assignment ->
-                val intent = Intent(this, AssignmentReportActivity::class.java).apply {
-                    putExtra("assignmentId", assignment.id)
-                    putExtra("isFromHistory", true)
-                }
-                startActivity(intent)
+        ) { assignment ->
+            val intent = Intent(this, AssignmentReportActivity::class.java).apply {
+                putExtra("assignmentId", assignment.id)
+                putExtra("isFromHistory", true)
             }
-        )
+            startActivity(intent)
+        }
         recyclerView.adapter = adapter
 
         findViewById<FloatingActionButton>(R.id.fabAddAssignment).setOnClickListener {
@@ -231,7 +230,7 @@ class DispatchActivity : BaseActivity() {
                     status = AssignmentStatus.NEW,
                     creationTime = now,
                     notes = "Ausgangssituation: $summary",
-                    assignedUnits = tempAssignedUnits.toMutableList()
+                    assignedUnits = tempAssignedUnits.toMutableList(),
                 )
                 
                 allAssignments.add(0, newAssignment)
@@ -263,10 +262,14 @@ class DispatchActivity : BaseActivity() {
                 
                 val unitsArray = JSONArray()
                 ass.assignedUnits.forEach { unit ->
-                    unitsArray.put(JSONObject().apply {
-                        put("callsign", unit.callsign); put("organization", unit.organization)
-                        put("status", unit.status); put("alarmTime", unit.alarmTime); put("arrivalTime", unit.arrivalTime)
-                    })
+                    val unitObj = JSONObject().apply {
+                        put("callsign", unit.callsign)
+                        put("organization", unit.organization)
+                        put("status", unit.status)
+                        put("alarmTime", unit.alarmTime)
+                        put("arrivalTime", unit.arrivalTime)
+                    }
+                    unitsArray.put(unitObj)
                 }
                 put("units", unitsArray)
             }
@@ -292,16 +295,22 @@ class DispatchActivity : BaseActivity() {
                         creationTime = obj.optString("creationTime", ""),
                         acceptanceTime = obj.optString("acceptanceTime", ""),
                         completionTime = obj.optString("completionTime", ""),
-                        callsign = obj.optString("callsign", ""), notes = obj.optString("notes", "")
+                        callsign = obj.optString("callsign", ""),
+                        notes = obj.optString("notes", ""),
                     )
                     val unitsArray = obj.optJSONArray("units")
                     if (unitsArray != null) {
                         for (j in 0 until unitsArray.length()) {
                             val uo = unitsArray.getJSONObject(j)
-                            ass.assignedUnits.add(UnitData(
-                                uo.getString("callsign"), uo.getString("organization"),
-                                uo.optString("status", ""), uo.optString("alarmTime", ""), uo.optString("arrivalTime", "")
-                            ))
+                            ass.assignedUnits.add(
+                                UnitData(
+                                    uo.getString("callsign"),
+                                    uo.getString("organization"),
+                                    uo.optString("status", ""),
+                                    uo.optString("alarmTime", ""),
+                                    uo.optString("arrivalTime", ""),
+                                ),
+                            )
                         }
                     }
                     allAssignments.add(ass)
@@ -326,11 +335,26 @@ class DispatchActivity : BaseActivity() {
     private fun buildAdapterItems(assignments: List<Assignment>): List<AdapterItem> {
         val items = mutableListOf<AdapterItem>()
         items.add(AdapterItem.Header("Neueste Einsätze", AssignmentStatus.NEW))
-        items.addAll(assignments.filter { it.status == AssignmentStatus.NEW }.map { AdapterItem.AssignmentItem(it) })
+        items.addAll(
+            assignments.asSequence()
+                .filter { it.status == AssignmentStatus.NEW }
+                .map { AdapterItem.AssignmentItem(it) }
+                .toList(),
+        )
         items.add(AdapterItem.Header("Laufende Einsätze", AssignmentStatus.ONGOING))
-        items.addAll(assignments.filter { it.status == AssignmentStatus.ONGOING }.map { AdapterItem.AssignmentItem(it) })
+        items.addAll(
+            assignments.asSequence()
+                .filter { it.status == AssignmentStatus.ONGOING }
+                .map { AdapterItem.AssignmentItem(it) }
+                .toList(),
+        )
         items.add(AdapterItem.Header("Abgeschlossene Einsätze", AssignmentStatus.COMPLETED))
-        items.addAll(assignments.filter { it.status == AssignmentStatus.COMPLETED }.map { AdapterItem.AssignmentItem(it) })
+        items.addAll(
+            assignments.asSequence()
+                .filter { it.status == AssignmentStatus.COMPLETED }
+                .map { AdapterItem.AssignmentItem(it) }
+                .toList(),
+        )
         return items
     }
 }

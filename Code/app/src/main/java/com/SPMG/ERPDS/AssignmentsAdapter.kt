@@ -14,7 +14,7 @@ data class UnitData(
     val organization: String,
     var status: String = "",
     var alarmTime: String = "",
-    var arrivalTime: String = ""
+    var arrivalTime: String = "",
 )
 
 data class Assignment(
@@ -29,7 +29,7 @@ data class Assignment(
     var completionTime: String = "",
     var callsign: String = "",
     var notes: String = "",
-    val assignedUnits: MutableList<UnitData> = mutableListOf()
+    val assignedUnits: MutableList<UnitData> = mutableListOf(),
 )
 
 sealed class AdapterItem {
@@ -41,7 +41,7 @@ class AssignmentsAdapter(
     private var allItems: List<AdapterItem>,
     private val onOpenClick: (Assignment) -> Unit,
     private val onDismissClick: (Assignment) -> Unit,
-    private val onReportClick: (Assignment) -> Unit
+    private val onReportClick: (Assignment) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var visibleItems: MutableList<AdapterItem> = mutableListOf()
@@ -63,7 +63,7 @@ class AssignmentsAdapter(
             if (item is AdapterItem.Header) {
                 visibleItems.add(item)
                 currentHeaderExpanded = item.isExpanded
-            } else if (item is AdapterItem.AssignmentItem && (currentHeaderExpanded)) {
+            } else if ((item is AdapterItem.AssignmentItem) && currentHeaderExpanded) {
                 visibleItems.add(item)
             }
         }

@@ -102,7 +102,7 @@ class MainActivity : BaseActivity() {
                 arrayOf(
                     Manifest.permission.READ_CONTACTS,
                     Manifest.permission.GET_ACCOUNTS,
-                )
+                ),
             )
         }
         

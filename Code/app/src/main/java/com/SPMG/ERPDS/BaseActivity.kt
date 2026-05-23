@@ -34,7 +34,9 @@ abstract class BaseActivity : AppCompatActivity() {
                 contentResolver.query(
                     ContactsContract.Profile.CONTENT_URI,
                     arrayOf(ContactsContract.Profile.DISPLAY_NAME, ContactsContract.Profile.DISPLAY_NAME_PRIMARY),
-                    null, null, null
+                    null,
+                    null,
+                    null,
                 )?.use { cursor ->
                     if (cursor.moveToFirst()) {
                         identity = cursor.getString(0) ?: cursor.getString(1)
@@ -45,7 +47,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     val profileDataUri = Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI, ContactsContract.Contacts.Data.CONTENT_DIRECTORY)
                     val projection = arrayOf(
                         ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                        ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME
+                        ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
                     )
                     val where = "${ContactsContract.Data.MIMETYPE} = ?"
                     val whereArgs = arrayOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
@@ -80,7 +82,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
         if (identity.isNullOrEmpty()) {
             val btName = android.provider.Settings.Secure.getString(contentResolver, "bluetooth_name")
-            if (!btName.isNullOrEmpty() && btName != android.os.Build.MODEL) {
+            if ((!btName.isNullOrEmpty()) && (btName != android.os.Build.MODEL)) {
                 identity = btName
             }
         }
@@ -94,7 +96,9 @@ abstract class BaseActivity : AppCompatActivity() {
                 contentResolver.query(
                     ContactsContract.Profile.CONTENT_URI,
                     arrayOf(ContactsContract.Profile.PHOTO_URI),
-                    null, null, null
+                    null,
+                    null,
+                    null,
                 )?.use { cursor ->
                     if (cursor.moveToFirst()) {
                         val uriString = cursor.getString(0)

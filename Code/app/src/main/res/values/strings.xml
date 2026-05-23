@@ -86,14 +86,18 @@
     <string name="title_check_in_out">Zeiterfassung</string>
     <string name="status_checked_out">Aktueller Status: Ausgecheckt</string>
     <string name="status_checked_in">Aktueller Status: Eingecheckt</string>
+    <string name="status_paused">Außer Dienst (Pause 30 Min)</string>
     <string name="btn_check_in">Einstempeln</string>
     <string name="btn_check_out">Ausstempeln</string>
     <string name="btn_pause_start">Pause starten</string>
     <string name="btn_pause_stop">Pause beenden</string>
     <string name="label_pause_timer">Pause: %1$s</string>
+    <string name="label_pause_ends_in">Pause endet in: %1$s</string>
     <string name="label_shift_history">Schichthistorie</string>
     <string name="label_no_history">Keine vergangenen Schichten vorhanden.</string>
     <string name="shift_history_entry">%1$s - %2$s (%3$dh %4$dm netto)</string>
+    <string name="timer_default">00:00:00</string>
+    <string name="shift_details_format">Dienstzeit: %1$s - %2$s (%3$sh %4$sm netto)\nPausenzeiten: %5$s</string>
 
     <!-- QR Check-In -->
     <string name="title_qr_checkin">Fahrzeug Check-in</string>
@@ -130,7 +134,7 @@
     <!-- Create Assignment -->
     <string name="title_create_assignment">Einsatz erstellen (Test)</string>
     <string name="hint_assignment_title">Einsatzstichwort (z.B. B3 Gebäudebrand)</string>
-    <string name="hint_assignment_number">Einsatznummer (z.B. 2024-999)</string>
+    <string name="hint_assignment_number">Einsatznummer (z.B. 2024&#8211;999)</string>
     <string name="hint_assignment_location">Einsatzort (Adresse)</string>
     <string name="hint_assignment_details">Zusatzinformationen / Details</string>
     <string name="label_select_department">Bereich wählen:</string>
@@ -141,14 +145,16 @@
     <string name="label_assigned_units_count">Zugeordnete Einheiten: %1$d</string>
     <string name="label_no_units_assigned">Noch keine Einheiten zugewiesen.</string>
     <string name="btn_add_units">+ Einheiten hinzufügen</string>
+    <string name="btn_add_unit_row">+ Einheit hinzufügen</string>
+    <string name="title_add_units">Einheiten hinzufügen</string>
     <string name="btn_create">Hinzufügen</string>
     <string name="btn_cancel">Abbrechen</string>
 
     <!-- Ongoing Notes -->
     <string name="label_ongoing_notes">Laufende Notizen zum Einsatz</string>
-    <string name="hint_ongoing_notes">Hier Notizen ergänzen...</string>
+    <string name="hint_ongoing_notes">Hier Notizen ergänzen&#8230;</string>
     <string name="label_completion_report">Einsatzabschlussmeldung:</string>
-    <string name="hint_completion_report">Einsatzabschlussmeldung...</string>
+    <string name="hint_completion_report">Einsatzabschlussmeldung&#8230;</string>
 
     <string name="btn_arrived_at_scene">Am BE eingetroffen</string>
     <string name="status_arrived_at_scene">eingetroffen (%1$s)</string>

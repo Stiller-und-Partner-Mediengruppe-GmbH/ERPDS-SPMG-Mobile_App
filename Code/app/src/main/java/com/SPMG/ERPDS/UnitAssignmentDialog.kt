@@ -1,7 +1,6 @@
 package com.spmg.erpds
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -16,7 +15,7 @@ import java.util.TimeZone
 
 class UnitAssignmentDialog(
     private val context: Context,
-    private val onUnitsConfirmed: (List<UnitData>) -> Unit
+    private val onUnitsConfirmed: (List<UnitData>) -> Unit,
 ) {
     private val orgs = listOf(
         "MA-70(BR-W)", 
@@ -24,7 +23,7 @@ class UnitAssignmentDialog(
         "EXE(LPD)", 
         "WW(MA-31)", 
         "WE(Wien Energie)", 
-        "WN(Wiener Netze)"
+        "WN(Wiener Netze)",
     )
 
     fun show() {
@@ -34,7 +33,7 @@ class UnitAssignmentDialog(
         }
 
         val tvTitle = TextView(context).apply {
-            text = "Einheiten hinzufügen"
+            text = context.getString(R.string.title_add_units)
             setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
             setPadding(0, 0, 0, 16)
         }
@@ -46,7 +45,7 @@ class UnitAssignmentDialog(
         container.addView(unitsListLayout)
 
         val btnAddRow = Button(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
-            text = "+ Einheit hinzufügen"
+            text = context.getString(R.string.btn_add_unit_row)
             setOnClickListener {
                 addUnitRow(unitsListLayout)
             }

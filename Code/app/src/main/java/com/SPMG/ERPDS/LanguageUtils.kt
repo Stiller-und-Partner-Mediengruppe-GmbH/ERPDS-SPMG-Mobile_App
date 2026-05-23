@@ -1,7 +1,6 @@
 package com.spmg.erpds
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.os.LocaleList
 import android.view.View
 import android.widget.EditText
@@ -19,14 +18,9 @@ object LanguageUtils {
         
         val config = Configuration(context.resources.configuration)
         
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            config.setLocale(locale)
-            val localeList = LocaleList(locale)
-            config.setLocales(localeList)
-        } else {
-            @Suppress("DEPRECATION")
-            config.locale = locale
-        }
+        config.setLocale(locale)
+        val localeList = LocaleList(locale)
+        config.setLocales(localeList)
         
         config.setLayoutDirection(locale)
         
@@ -39,9 +33,7 @@ object LanguageUtils {
      * vom System und der Tastatur (auch Emulator-Hardware-Keyboard) anfordert.
      */
     fun configureGermanInput(editText: EditText) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            editText.imeHintLocales = LocaleList(Locale("de", "AT"))
-        }
+        editText.imeHintLocales = LocaleList(Locale("de", "AT"))
         
         // Erzwingt, dass das Feld Text-Vorschläge und Umlaute zulässt
         editText.textDirection = View.TEXT_DIRECTION_LTR

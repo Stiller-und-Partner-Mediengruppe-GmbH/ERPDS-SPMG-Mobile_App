@@ -19,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.text.SimpleDateFormat
@@ -69,7 +70,7 @@ class CheckInOutActivity : BaseActivity() {
     }
 
     private val requestNotificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         if (isGranted) {
             updateNotification()
@@ -130,13 +131,11 @@ class CheckInOutActivity : BaseActivity() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.notif_channel_name)
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(NOTIF_CHANNEL_ID, name, importance)
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val name = getString(R.string.notif_channel_name)
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(NOTIF_CHANNEL_ID, name, importance)
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun updateNotification() {
@@ -147,8 +146,8 @@ class CheckInOutActivity : BaseActivity() {
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) &&
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)) {
             return
         }
 
@@ -163,15 +162,11 @@ class CheckInOutActivity : BaseActivity() {
         if (isPaused) {
             builder.setContentText(getString(R.string.notif_content_paused))
             builder.setWhen(pauseEndTime)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                builder.setChronometerCountDown(true)
-            }
+            builder.setChronometerCountDown(true)
         } else {
             builder.setContentText(getString(R.string.notif_content_active))
             builder.setWhen(checkInTime + totalPauseDuration)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                builder.setChronometerCountDown(false)
-            }
+            builder.setChronometerCountDown(false)
         }
 
         notificationManager.notify(NOTIF_ID, builder.build())
@@ -197,7 +192,7 @@ class CheckInOutActivity : BaseActivity() {
         lastShiftPauseStarts.clear()
         lastShiftPauseEnds.clear()
         
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putBoolean(KEY_IS_CHECKED_IN, true)
             putBoolean(KEY_IS_PAUSED, false)
             putLong(KEY_CHECK_IN_TIME, checkInTime)
@@ -206,7 +201,7 @@ class CheckInOutActivity : BaseActivity() {
             putLong(KEY_PAUSE_END_TIME, 0)
             putString("CurrentShiftPauseStarts", "")
             putString("CurrentShiftPauseEnds", "")
-        }.apply()
+        }
 
         Toast.makeText(this, "Eingecheckt um ${formatTime(checkInTime)}", Toast.LENGTH_SHORT).show()
         handler.post(updateTask)
@@ -219,8 +214,7 @@ class CheckInOutActivity : BaseActivity() {
             endPause(now)
         }
 
-        val checkOutTime = now
-        saveToHistory(checkInTime, checkOutTime, totalPauseDuration)
+        saveToHistory(checkInTime, now, totalPauseDuration)
 
         isCheckedIn = false
         checkInTime = 0
@@ -228,7 +222,7 @@ class CheckInOutActivity : BaseActivity() {
         lastShiftPauseStarts.clear()
         lastShiftPauseEnds.clear()
         
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putBoolean(KEY_IS_CHECKED_IN, false)
             putBoolean(KEY_IS_PAUSED, false)
             putLong(KEY_CHECK_IN_TIME, 0)
@@ -237,9 +231,9 @@ class CheckInOutActivity : BaseActivity() {
             putLong(KEY_PAUSE_END_TIME, 0)
             putString("CurrentShiftPauseStarts", "")
             putString("CurrentShiftPauseEnds", "")
-        }.apply()
+        }
 
-        getSharedPreferences(PREFS_FLEET, MODE_PRIVATE).edit().clear().apply()
+        getSharedPreferences(PREFS_FLEET, MODE_PRIVATE).edit { clear() }
 
         handler.removeCallbacks(updateTask)
         updateUI()
@@ -264,11 +258,11 @@ class CheckInOutActivity : BaseActivity() {
         
         saveCurrentShiftPauses()
         
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putBoolean(KEY_IS_PAUSED, true)
             putLong(KEY_PAUSE_START_TIME, pauseStartTime)
             putLong(KEY_PAUSE_END_TIME, pauseEndTime)
-        }.apply()
+        }
         
         Toast.makeText(this, "Pause gestartet (30 Min)", Toast.LENGTH_SHORT).show()
         updateUI()
@@ -284,12 +278,12 @@ class CheckInOutActivity : BaseActivity() {
         
         saveCurrentShiftPauses()
         
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putBoolean(KEY_IS_PAUSED, false)
             putLong(KEY_PAUSE_START_TIME, 0)
             putLong(KEY_PAUSE_END_TIME, 0)
             putLong(KEY_TOTAL_PAUSE_DURATION, totalPauseDuration)
-        }.apply()
+        }
         
         pauseTimerText.visibility = View.GONE
         Toast.makeText(this, "Pause beendet", Toast.LENGTH_SHORT).show()
@@ -303,7 +297,7 @@ class CheckInOutActivity : BaseActivity() {
 
         if (isCheckedIn) {
             if (isPaused) {
-                statusText.text = "Außer Dienst (Pause 30 Min)"
+                statusText.text = getString(R.string.status_paused)
                 statusText.setTextColor(getColor(android.R.color.holo_orange_dark))
             } else {
                 statusText.text = getString(R.string.status_checked_in)
@@ -313,7 +307,7 @@ class CheckInOutActivity : BaseActivity() {
         } else {
             statusText.text = getString(R.string.status_checked_out)
             statusText.setTextColor(getColor(android.R.color.darker_gray))
-            timerText.text = "00:00:00"
+            timerText.text = getString(R.string.timer_default)
         }
         updateNotification()
     }
@@ -332,7 +326,7 @@ class CheckInOutActivity : BaseActivity() {
             timerText.text = formatDuration(pauseStartTime - checkInTime - totalPauseDuration)
             
             val remainingPause = pauseEndTime - now
-            pauseTimerText.text = "Pause endet in: ${formatDuration(remainingPause)}"
+            pauseTimerText.text = getString(R.string.label_pause_ends_in, formatDuration(remainingPause))
         } else {
             val totalDuration = now - checkInTime - totalPauseDuration
             timerText.text = formatDuration(totalDuration)
@@ -361,14 +355,17 @@ class CheckInOutActivity : BaseActivity() {
         // Format: Date | Start | End | NetHours | NetMins | PauseDetails
         val entry = "$dateStr|${formatTime(start)}|${formatTime(end)}|$hours|$mins|$pauseStr"
         historySet.add(entry)
-        prefs.edit().putStringSet(KEY_HISTORY, historySet).apply()
+        prefs.edit { putStringSet(KEY_HISTORY, historySet) }
         loadHistory()
     }
 
     private fun loadHistory() {
         historyContainer.removeAllViews()
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val history = prefs.getStringSet(KEY_HISTORY, emptySet())?.toList()?.sortedByDescending { it } ?: emptyList()
+        val history = prefs.getStringSet(KEY_HISTORY, emptySet())
+            ?.asSequence()
+            ?.sortedByDescending { it }
+            ?.toList() ?: emptyList()
 
         if (history.isEmpty()) {
             val tv = TextView(this).apply { text = getString(R.string.label_no_history); setPadding(0, 16, 0, 0) }
@@ -383,20 +380,24 @@ class CheckInOutActivity : BaseActivity() {
                 val view = inflater.inflate(R.layout.item_shift_history, historyContainer, false)
                 view.findViewById<TextView>(R.id.tvShiftDate).text = parts[0]
                 
-                val baseDetails = "Dienstzeit: ${parts[1]} - ${parts[2]} (${parts[3]}h ${parts[4]}m netto)"
-                val pauseInfo = "\nPausenzeiten: ${parts[5]}"
-                
-                view.findViewById<TextView>(R.id.tvShiftDetails).text = "$baseDetails$pauseInfo"
+                view.findViewById<TextView>(R.id.tvShiftDetails).text = getString(
+                    R.string.shift_details_format,
+                    parts[1],
+                    parts[2],
+                    parts[3],
+                    parts[4],
+                    parts[5],
+                )
                 historyContainer.addView(view)
             }
         }
     }
 
     private fun saveCurrentShiftPauses() {
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putString("CurrentShiftPauseStarts", lastShiftPauseStarts.joinToString(","))
             putString("CurrentShiftPauseEnds", lastShiftPauseEnds.joinToString(","))
-        }.apply()
+        }
     }
 
     private fun loadCurrentShiftPauses() {
