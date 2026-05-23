@@ -143,4 +143,31 @@
     <string name="btn_add_units">+ Einheiten hinzufügen</string>
     <string name="btn_create">Hinzufügen</string>
     <string name="btn_cancel">Abbrechen</string>
+
+    <!-- Ongoing Notes -->
+    <string name="label_ongoing_notes">Laufende Notizen zum Einsatz</string>
+    <string name="hint_ongoing_notes">Hier Notizen ergänzen...</string>
+    <string name="label_completion_report">Einsatzabschlussmeldung:</string>
+    <string name="hint_completion_report">Einsatzabschlussmeldung...</string>
+
+    <string name="btn_arrived_at_scene">Am BE eingetroffen</string>
+    <string name="status_arrived_at_scene">eingetroffen (%1$s)</string>
+
+    <!-- Shift Notifications -->
+    <string name="notif_channel_name">Schicht-Status</string>
+    <string name="notif_title_shift_running">Schicht läuft</string>
+    <string name="notif_content_active">Dienstzeit aktiv</string>
+    <string name="notif_content_paused">Pause endet in:</string>
+
+    <!-- Fleet Crew -->
+    <string name="title_fleet_crew">Besatzung / Team</string>
+    <string name="btn_send_notification">Nachricht</string>
+    <string name="prompt_send_message">Nachricht an %1$s senden</string>
+    <string name="hint_message_text">Ihre Nachricht…</string>
+    <string name="btn_send">Senden</string>
+
+    <!-- Save Report -->
+    <string name="btn_save_report">Bericht auf Gerät speichern</string>
+    <string name="msg_report_saved">Einsatzbericht erfolgreich gespeichert unter Documents/ERPDS_Reports</string>
+    <string name="msg_save_failed">Fehler beim Speichern des Berichts</string>
 </resources>

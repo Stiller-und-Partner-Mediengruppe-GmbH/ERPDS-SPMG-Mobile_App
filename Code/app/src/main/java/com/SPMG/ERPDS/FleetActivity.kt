@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.OptIn
+import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -269,6 +272,61 @@ class FleetActivity : BaseActivity() {
             findViewById<TextView>(R.id.tvActiveVehicle).text = currentVehicle
             findViewById<TextView>(R.id.tvActiveRole).text = currentRole
             findViewById<TextView>(R.id.tvRadioStatus).text = getString(R.string.radio_status_format, currentVehicle)
+            
+            updateCrewList()
         }
+    }
+
+    private fun updateCrewList() {
+        val container = findViewById<LinearLayout>(R.id.crewContainer)
+        container.removeAllViews()
+
+        // Mock crew data based on vehicle type (e.g. RTW usually has 2-3 people)
+        val mockCrew = mutableListOf<Pair<String, String>>()
+        
+        if (currentRole != getString(R.string.role_driver)) {
+            mockCrew.add("Maximilian Muster" to getString(R.string.role_driver))
+        }
+        if (currentRole != getString(R.string.role_leader)) {
+            mockCrew.add("Julia Beispiel" to getString(R.string.role_leader))
+        }
+        if (currentRole != getString(R.string.role_assistant)) {
+            mockCrew.add("Lukas Test" to getString(R.string.role_assistant))
+        }
+
+        mockCrew.forEach { (name, role) ->
+            val itemView = layoutInflater.inflate(R.layout.item_fleet_crew, container, false)
+            itemView.findViewById<TextView>(R.id.tvMemberName).text = name
+            itemView.findViewById<TextView>(R.id.tvMemberRole).text = role
+            itemView.findViewById<Button>(R.id.btnNotifyMember).setOnClickListener {
+                showSendNotificationDialog(name)
+            }
+            container.addView(itemView)
+        }
+    }
+
+    private fun showSendNotificationDialog(name: String) {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(64, 32, 64, 0)
+        }
+        
+        val input = EditText(this).apply {
+            hint = getString(R.string.hint_message_text)
+            minLines = 2
+        }
+        container.addView(input)
+        
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.prompt_send_message, name))
+            .setView(container)
+            .setPositiveButton(getString(R.string.btn_send)) { _, _ ->
+                val message = input.text.toString()
+                if (message.isNotEmpty()) {
+                    Toast.makeText(this, "Nachricht an $name gesendet: $message", Toast.LENGTH_LONG).show()
+                }
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 }

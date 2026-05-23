@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.card.MaterialCardView
-import java.util.Locale
 
 class IDCheckActivity : BaseActivity() {
 

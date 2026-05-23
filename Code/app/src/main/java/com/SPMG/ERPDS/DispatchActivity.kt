@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -112,6 +113,7 @@ class DispatchActivity : BaseActivity() {
             onReportClick = { assignment ->
                 val intent = Intent(this, AssignmentReportActivity::class.java).apply {
                     putExtra("assignmentId", assignment.id)
+                    putExtra("isFromHistory", true)
                 }
                 startActivity(intent)
             }
@@ -243,7 +245,7 @@ class DispatchActivity : BaseActivity() {
     private fun generateAssignmentNumber(deptId: String): String {
         val prefs = getSharedPreferences(PREFS_ASSIGNMENTS, MODE_PRIVATE)
         val counter = prefs.getInt(KEY_COUNTER, 0) + 1
-        prefs.edit().putInt(KEY_COUNTER, counter).apply()
+        prefs.edit { putInt(KEY_COUNTER, counter) }
         val datePart = SimpleDateFormat("yyyyMMdd-HHmm", Locale.getDefault()).apply {
             timeZone = TimeZone.getTimeZone("Europe/Vienna")
         }.format(Date())
@@ -270,7 +272,7 @@ class DispatchActivity : BaseActivity() {
             }
             array.put(obj)
         }
-        getSharedPreferences(PREFS_ASSIGNMENTS, MODE_PRIVATE).edit().putString(KEY_DATA, array.toString()).apply()
+        getSharedPreferences(PREFS_ASSIGNMENTS, MODE_PRIVATE).edit { putString(KEY_DATA, array.toString()) }
     }
 
     private fun loadAssignments() {

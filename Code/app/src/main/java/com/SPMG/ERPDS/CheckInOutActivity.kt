@@ -1,5 +1,10 @@
 package com.spmg.erpds
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,7 +15,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.text.SimpleDateFormat
@@ -31,6 +39,9 @@ class CheckInOutActivity : BaseActivity() {
         private const val KEY_TOTAL_PAUSE_DURATION = "TotalPauseDuration"
         private const val KEY_HISTORY = "ShiftHistory"
         private const val PAUSE_DURATION_MS = 30 * 60 * 1000L
+        
+        private const val NOTIF_CHANNEL_ID = "shift_notification_channel"
+        private const val NOTIF_ID = 1001
     }
 
     private var isCheckedIn = false
@@ -54,6 +65,14 @@ class CheckInOutActivity : BaseActivity() {
         override fun run() {
             updateTimers()
             handler.postDelayed(this, 1000)
+        }
+    }
+
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            updateNotification()
         }
     }
 
@@ -96,7 +115,66 @@ class CheckInOutActivity : BaseActivity() {
         btnPause.setOnClickListener { togglePause() }
 
         loadHistory()
+        createNotificationChannel()
+        checkNotificationPermission()
         updateUI()
+        updateNotification()
+    }
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.notif_channel_name)
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID, name, importance)
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun updateNotification() {
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        
+        if (!isCheckedIn) {
+            notificationManager.cancel(NOTIF_ID)
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+
+        val builder = NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(getString(R.string.notif_title_shift_running))
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setUsesChronometer(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+        if (isPaused) {
+            builder.setContentText(getString(R.string.notif_content_paused))
+            builder.setWhen(pauseEndTime)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                builder.setChronometerCountDown(true)
+            }
+        } else {
+            builder.setContentText(getString(R.string.notif_content_active))
+            builder.setWhen(checkInTime + totalPauseDuration)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                builder.setChronometerCountDown(false)
+            }
+        }
+
+        notificationManager.notify(NOTIF_ID, builder.build())
     }
 
     override fun onResume() {
@@ -237,6 +315,7 @@ class CheckInOutActivity : BaseActivity() {
             statusText.setTextColor(getColor(android.R.color.darker_gray))
             timerText.text = "00:00:00"
         }
+        updateNotification()
     }
 
     private fun updateTimers() {
@@ -270,15 +349,16 @@ class CheckInOutActivity : BaseActivity() {
         val pauseDetails = StringBuilder()
         for (i in lastShiftPauseStarts.indices) {
             val pStart = formatTime(lastShiftPauseStarts[i])
-            val pEnd = if (i < lastShiftPauseEnds.size) formatTime(lastShiftPauseEnds[i]) else "N/A"
-            pauseDetails.append("$pStart-$pEnd,")
+            val pEnd = if (i < lastShiftPauseEnds.size) formatTime(lastShiftPauseEnds[i]) else "Laufend"
+            pauseDetails.append("$pStart bis $pEnd, ")
         }
-        val pauseStr = if (pauseDetails.isNotEmpty()) pauseDetails.substring(0, pauseDetails.length - 1) else "Keine"
+        val pauseStr = if (pauseDetails.isNotEmpty()) pauseDetails.toString().trim().removeSuffix(",") else "Keine"
         
         val netDuration = (end - start) - pause
         val hours = (netDuration / (1000 * 60 * 60)).toInt()
         val mins = ((netDuration / (1000 * 60)) % 60).toInt()
         
+        // Format: Date | Start | End | NetHours | NetMins | PauseDetails
         val entry = "$dateStr|${formatTime(start)}|${formatTime(end)}|$hours|$mins|$pauseStr"
         historySet.add(entry)
         prefs.edit().putStringSet(KEY_HISTORY, historySet).apply()
@@ -288,7 +368,7 @@ class CheckInOutActivity : BaseActivity() {
     private fun loadHistory() {
         historyContainer.removeAllViews()
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val history = prefs.getStringSet(KEY_HISTORY, emptySet())?.toList()?.sortedDescending() ?: emptyList()
+        val history = prefs.getStringSet(KEY_HISTORY, emptySet())?.toList()?.sortedByDescending { it } ?: emptyList()
 
         if (history.isEmpty()) {
             val tv = TextView(this).apply { text = getString(R.string.label_no_history); setPadding(0, 16, 0, 0) }
@@ -297,14 +377,14 @@ class CheckInOutActivity : BaseActivity() {
         }
 
         val inflater = LayoutInflater.from(this)
-        history.take(5).forEach { entry ->
+        history.take(10).forEach { entry ->
             val parts = entry.split("|")
-            if (parts.size >= 5) {
+            if (parts.size >= 6) {
                 val view = inflater.inflate(R.layout.item_shift_history, historyContainer, false)
                 view.findViewById<TextView>(R.id.tvShiftDate).text = parts[0]
                 
-                val baseDetails = getString(R.string.shift_history_entry, parts[1], parts[2], parts[3].toInt(), parts[4].toInt())
-                val pauseInfo = if (parts.size > 5) "\nPausen: ${parts[5]}" else ""
+                val baseDetails = "Dienstzeit: ${parts[1]} - ${parts[2]} (${parts[3]}h ${parts[4]}m netto)"
+                val pauseInfo = "\nPausenzeiten: ${parts[5]}"
                 
                 view.findViewById<TextView>(R.id.tvShiftDetails).text = "$baseDetails$pauseInfo"
                 historyContainer.addView(view)

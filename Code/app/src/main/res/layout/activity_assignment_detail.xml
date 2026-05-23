@@ -102,6 +102,7 @@
                 tools:text="Rauchentwicklung aus dem Dachbereich sichtbar..." />
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/labelUnits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/label_einheiten"
@@ -114,16 +115,60 @@
                 android:orientation="vertical"
                 android:layout_marginTop="4dp" />
 
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/notesDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:visibility="gone" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/labelOngoingNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_ongoing_notes"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:visibility="gone" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ongoingNotesLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/hint_ongoing_notes"
+                android:visibility="gone"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etOngoingNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:minLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="16dp"
         android:background="?attr/colorSurface"
         app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnArrivedAtScene"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="@string/btn_arrived_at_scene"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:cornerRadius="12dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAcceptAssignment"
@@ -132,6 +177,6 @@
             android:text="@string/btn_accept_assignment"
             android:textSize="18sp"
             app:cornerRadius="12dp" />
-    </FrameLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
